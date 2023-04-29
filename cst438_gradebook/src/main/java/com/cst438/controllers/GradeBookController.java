@@ -1,12 +1,15 @@
 package com.cst438.controllers;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,6 +60,21 @@ public class GradeBookController {
 		return result;
 	}
 	
+	// get all assignments
+	@GetMapping("/all")
+	public AssignmentListDTO getAssignments( ) {
+		
+		//String email = "dwisneski@csumb.edu";  // user name (should be instructor's email) 
+		
+		Iterable<Assignment> assignments = assignmentRepository.findAll();
+		AssignmentListDTO result = new AssignmentListDTO();
+		
+		for (Assignment a: assignments) {
+			result.assignments.add(new AssignmentListDTO.AssignmentDTO(a.getId(), a.getCourse().getCourse_id(), a.getName(), a.getDueDate().toString() , a.getCourse().getTitle()));
+		}
+		return result;
+	}
+
 	@GetMapping("/gradebook/{id}")
 	public GradebookDTO getGradebook(@PathVariable("id") Integer assignmentId  ) {
 		
@@ -132,9 +150,9 @@ public class GradeBookController {
 		return "F";
 	}
 	
-	@PutMapping("/gradebook/{id}")
+	@PutMapping("/gradebook/grade/{id}")
 	@Transactional
-	public void updateGradebook (@RequestBody GradebookDTO gradebook, @PathVariable("id") Integer assignmentId ) {
+	public void updateGradeOnAssignment (@RequestBody GradebookDTO gradebook, @PathVariable("id") Integer assignmentId ) {
 		
 		String email = "dwisneski@csumb.edu";  // user name (should be instructor's email) 
 		checkAssignment(assignmentId, email);  // check that user name matches instructor email of the course.
@@ -145,14 +163,38 @@ public class GradeBookController {
 		for (GradebookDTO.Grade g : gradebook.grades) {
 			System.out.printf("%s\n", g.toString());
 			AssignmentGrade ag = assignmentGradeRepository.findById(g.assignmentGradeId).orElse(null);
+			
 			if (ag == null) {
 				throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Invalid grade primary key. "+g.assignmentGradeId);
 			}
+
 			ag.setScore(g.grade);
+			
 			System.out.printf("%s\n", ag.toString());
+
 			
 			assignmentGradeRepository.save(ag);
 		}
+		
+	}
+	
+	@DeleteMapping("/deleteAssignment")
+	@Transactional
+	public void deleteAssignment(@RequestBody GradebookDTO assignment) {
+
+		List<AssignmentGrade> ag = assignmentGradeRepository.findByAssignmentId(assignment.assignmentId);
+		Assignment a = assignmentRepository.findById(assignment.assignmentId).orElse(null);
+
+		System.out.println(ag.isEmpty());
+		if(ag.size()>0) {
+			for(AssignmentGrade agr : ag) {
+				assignmentGradeRepository.delete(agr);
+			}
+			assignmentRepository.delete(a);
+		}
+
+		//assignmentGradeRepository.delete(agr);
+		assignmentRepository.delete(a);
 		
 	}
 	
