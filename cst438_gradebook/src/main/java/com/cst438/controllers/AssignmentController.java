@@ -122,11 +122,11 @@ public class AssignmentController {
 			//return result;
 		}
 		
-		private AssignmentListDTO.AssignmentDTO createAssignmentDTO(Assignment a) {
-			Course c = a.getCourse();
-			AssignmentListDTO.AssignmentDTO assignmentDTO = new AssignmentListDTO.AssignmentDTO(a.getId(), c.getCourse_id(), a.getName(), a.getDueDate().toString(), c.getTitle());
-			return assignmentDTO;
-		}
+//		private AssignmentListDTO.AssignmentDTO createAssignmentDTO(Assignment a) {
+//			Course c = a.getCourse();
+//			AssignmentListDTO.AssignmentDTO assignmentDTO = new AssignmentListDTO.AssignmentDTO(a.getId(), c.getCourse_id(), a.getName(), a.getDueDate().toString(), c.getTitle());
+//			return assignmentDTO;
+//		}
 		
 		@PutMapping("/assignment/updateName")
 		@Transactional
