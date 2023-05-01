@@ -27,12 +27,8 @@ import com.cst438.domain.CourseRepository;
 @CrossOrigin(origins = {"http://localhost:3000","http://localhost:3001"})
 public class AssignmentController {
 
-	
 	@Autowired
 	AssignmentRepository assignmentRepository;
-	
-	@Autowired
-	AssignmentGradeRepository assignmentGradeRepository;
 	
 	@Autowired
 	CourseRepository courseRepository;
@@ -64,24 +60,66 @@ public class AssignmentController {
 			return assignment;
 		}
 		
+//		@PostMapping("/assignment")
+//		@Transactional
+//		public AssignmentDTO newAssignment(@RequestBody AssignmentDTO dto) {
+//			String userEmail = "dwisneski@csumb.edu";
+//			// validate course and that the course instructor is the user
+//			Course c = courseRepository.findById(dto.courseId).orElse(null);
+//			if (c != null && c.getInstructor().equals(userEmail)) {
+//				// create and save new assignment
+//				// update and return dto with new assignment primary key
+//				Assignment a = new Assignment();
+//				a.setCourse(c);
+//				a.setName(dto.name);
+//				a.setDueDate(Date.valueOf(dto.dueDate));
+//				a.setNeedsGrading(1);
+//				a = assignmentRepository.save(a);
+//				dto.id=a.getId();
+//				return dto;
+//				
+//			} else {
+//				// invalid course
+//				throw new ResponseStatusException( 
+//	                           HttpStatus.BAD_REQUEST, 
+//	                          "Invalid course id.");
+//			}
+//		}
+
+		
 		@PostMapping("/assignment")
 		@Transactional
 		public AssignmentListDTO.AssignmentDTO addAssignment(@RequestBody AssignmentListDTO.AssignmentDTO a) { 
 			
+			String userEmail = "dwisneski@csumb.edu";
+			
 			// get course for assignment
 			Course c = courseRepository.findById(a.courseId).orElse(null);
-			Assignment assignment = new Assignment();
-			assignment.setName(a.assignmentName);
-			assignment.setCourse(c);
-			Date date = java.sql.Date.valueOf(a.dueDate);
-			assignment.setDueDate(date);
-			assignment.setNeedsGrading(1);
-				
-			Assignment savedAssignment = assignmentRepository.save(assignment);
-			AssignmentListDTO.AssignmentDTO result = createAssignmentDTO(savedAssignment);
 			
-			System.out.printf("%s\n", assignment.getName());
-			return result;
+			if (c != null && c.getInstructor().equals(userEmail)) {
+				Assignment assignment = new Assignment();
+				assignment.setName(a.assignmentName);
+				assignment.setCourse(c);
+				Date date = java.sql.Date.valueOf(a.dueDate);
+				assignment.setDueDate(date);
+				assignment.setNeedsGrading(1);
+				
+				//Assignment savedAssignment = assignmentRepository.save(assignment);
+				//AssignmentListDTO.AssignmentDTO result = createAssignmentDTO(savedAssignment);
+				
+				assignment = assignmentRepository.save(assignment);
+				a.assignmentId = assignment.getId();
+				
+				//System.out.printf("%s\n", assignment.getName());
+				
+				return a;
+			
+			} else {
+				// invalid course
+				throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Invalid course id.");
+			}
+				
+			//return result;
 		}
 		
 		private AssignmentListDTO.AssignmentDTO createAssignmentDTO(Assignment a) {
