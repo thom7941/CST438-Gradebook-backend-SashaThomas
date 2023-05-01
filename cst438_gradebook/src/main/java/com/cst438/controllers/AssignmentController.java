@@ -59,32 +59,6 @@ public class AssignmentController {
 			
 			return assignment;
 		}
-		
-//		@PostMapping("/assignment")
-//		@Transactional
-//		public AssignmentDTO newAssignment(@RequestBody AssignmentDTO dto) {
-//			String userEmail = "dwisneski@csumb.edu";
-//			// validate course and that the course instructor is the user
-//			Course c = courseRepository.findById(dto.courseId).orElse(null);
-//			if (c != null && c.getInstructor().equals(userEmail)) {
-//				// create and save new assignment
-//				// update and return dto with new assignment primary key
-//				Assignment a = new Assignment();
-//				a.setCourse(c);
-//				a.setName(dto.name);
-//				a.setDueDate(Date.valueOf(dto.dueDate));
-//				a.setNeedsGrading(1);
-//				a = assignmentRepository.save(a);
-//				dto.id=a.getId();
-//				return dto;
-//				
-//			} else {
-//				// invalid course
-//				throw new ResponseStatusException( 
-//	                           HttpStatus.BAD_REQUEST, 
-//	                          "Invalid course id.");
-//			}
-//		}
 
 		
 		@PostMapping("/assignment")
