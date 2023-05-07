@@ -38,6 +38,9 @@ public class Assignment {
 	public String getName() {
 		return name;
 	}
+	public List<AssignmentGrade> getAssignmentGrades() {
+		return assignmentGrades;
+	}
 	public void setName(String name) {
 		this.name = name;
 	}
